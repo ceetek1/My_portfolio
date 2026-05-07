@@ -40,12 +40,12 @@ const skillGroups = [
   {
     title: "Languages",
     icon: Layers3,
-    skills: ["Python", "JavaScript", "HTML", "CSS", "React", "Tailwind CSS"],
+    skills: ["Python", "JavaScript", "Rust","HTML", "CSS", "React", "Tailwind CSS"],
   },
   {
     title: "Tools",
     icon: Terminal,
-    skills: ["Git", "GitHub", "npm", "VS Code", "Figma"],
+    skills: ["Git", "GitHub","npm", "VS Code", "Figma"],
   },
   {
     title: "Focus",
