@@ -45,7 +45,7 @@ const skillGroups = [
   {
     title: "Tools",
     icon: Terminal,
-    skills: ["Git", "GitHub", "Django", "npm", "VS Code", "Figma"],
+    skills: ["Git", "GitHub", "npm", "VS Code", "Figma"],
   },
   {
     title: "Focus",
