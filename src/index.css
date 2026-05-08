@@ -3,13 +3,13 @@
 @tailwind utilities;
 
 :root {
-  --navy: #0a192f;
-  --dark-navy: #020c1b;
+  --navy: #0e2445;
+  --dark-navy: #020d1d;
   --light-navy: #112240;
   --lightest-navy: #233554;
-  --slate: #8892b0;
+  --slate: #949db9;
   --slate-light: #ccd6f6;
-  --mint: #64ffda;
+  --mint: #7efddf;
   --mint-soft: rgba(100, 255, 218, 0.12);
   --line: rgba(136, 146, 176, 0.22);
   color-scheme: dark;

@@ -1,6 +1,6 @@
 # Charles Chukwurah Portfolio
 
-A clean React and Tailwind CSS portfolio for Charles Chukwurah, a Software Engineering Student at Pan-Atlantic University.
+A clean React and Tailwind CSS portfolio by Charles Chukwurah, a Software Engineering Student at Pan-Atlantic University.
 
 ## Tech Stack
 
