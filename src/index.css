@@ -159,15 +159,15 @@ img {
 
 .portrait-wrap {
   position: relative;
-  width: 150px;
-  height: 150px;
+  width: 200px;
+  height: 160px;
   perspective: 1000px;
   cursor: pointer;
 }
 
 .portrait-wrap:hover .portrait-glow {
   transform: rotate(0deg) scale(1.1);
-  filter: blur(8px);
+  filter: blur(8.1px);
   opacity: 0.9;
 }
 
