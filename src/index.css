@@ -159,8 +159,8 @@ img {
 
 .portrait-wrap {
   position: relative;
-  width: 200px;
-  height: 160px;
+  width: 150px;
+  height: 150px;
   perspective: 1000px;
   cursor: pointer;
 }
