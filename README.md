@@ -26,17 +26,19 @@ npm run build
 
 ## Deployment
 
-To access the website anywhere, deploy it to Vercel:
+The site is hosted on [Railway](https://railway.com). The Railway service is connected to this GitHub repository, so every push to `main` builds and deploys automatically.
 
-1. Push this project to GitHub.
-2. Go to `https://vercel.com/new`.
-3. Import the GitHub repository.
-4. Use these Vite settings:
+How it works:
 
-- Build command: `npm run build`
-- Output directory: `dist`
+- `railway.json` tells Railway to build with Railpack and run `npm run build`.
+- Railpack detects the Vite app and serves the `dist/` folder as a static site with Caddy, falling back to `index.html` for client-side routes.
+- The public URL is the service's `https://...up.railway.app` domain, shown in the Railway dashboard under the service's **Settings → Networking**.
 
-After deployment, Vercel will give you a public `https://...vercel.app` URL that works from any device with internet access.
+To deploy manually from your machine instead (requires the [Railway CLI](https://docs.railway.com/cli)):
+
+```bash
+railway up
+```
 
 The local dev server can also be opened by devices on the same Wi-Fi network using the Network URL printed by:
 
