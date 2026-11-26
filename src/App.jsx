@@ -1,532 +1,580 @@
 import {
+  ArrowDown,
+  ArrowUp,
   ArrowUpRight,
-  BookOpen,
   Code2,
-  ExternalLink,
   Github,
   GraduationCap,
   Layers3,
   Linkedin,
   Mail,
-  Menu,
-  Send,
-  Sparkles,
   Terminal,
   X,
 } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import Bob from "./components/Bob.jsx";
+import { highlights, marquee, navItems, profile, projects, skillGroups, tourStops } from "./data.js";
+import useScrollScene, { useReducedMotion } from "./hooks/useScrollScene.js";
 
-const profile = {
-  name: "Charles Chukwurah",
-  firstName: "charles",
-  title: "Software Engineering Student",
-  school: "Pan-Atlantic University",
-  email: "charles.chukwurah@pau.edu.ng",
-  github: "https://github.com/ceetek1",
-  linkedin: "https://www.linkedin.com/in/chukwurah-charles-652775377",
-  avatar: "https://github.com/ceetek1.png",
-};
+const ICONS = { layers: Layers3, terminal: Terminal, code: Code2 };
 
-const navItems = [
-  { label: "home", href: "#top" },
-  { label: "about", href: "#about" },
-  { label: "skills", href: "#skills" },
-  { label: "projects", href: "#projects" },
-  { label: "education", href: "#education" },
-  { label: "contact", href: "#contact" },
-];
-
-const skillGroups = [
-  {
-    title: "Languages",
-    icon: Layers3,
-    skills: ["Python", "JavaScript", "Rust","HTML", "CSS", "React", "Tailwind CSS"],
-  },
-  {
-    title: "Tools",
-    icon: Terminal,
-    skills: ["Git", "GitHub","npm", "VS Code", "Figma"],
-  },
-  {
-    title: "Focus",
-    icon: Code2,
-    skills: ["Software Engineering", "UI Development", "Problem Solving", "Clean Code"],
-  },
-];
-
-const projects = [
-  {
-    title: "Personal Portfolio Website",
-    description:
-      "A responsive React portfolio for presenting my background, skills, projects, and contact links in one focused place.",
-    tech: ["React", "Tailwind CSS", "Vite"],
-    github: profile.github,
-    live: "#top",
-  },
-  {
-    title: "JavaScript Learning Projects",
-    description:
-      "Small browser-based projects and exercises that help me practice core JavaScript, DOM interactions, and UI behavior.",
-    tech: ["JavaScript", "HTML", "CSS"],
-    github: profile.github,
-    live: "#",
-  },
-  {
-    title: "University Coursework",
-    description:
-      "Programming assignments, documentation, and collaborative software engineering work from Pan-Atlantic University.",
-    tech: ["Software Engineering", "GitHub", "Documentation"],
-    github: profile.github,
-    live: "#",
-  },
-];
-
-const highlights = [
-  "Building practical software engineering foundations through coursework and real projects.",
-  "Focused on Python, JavaScript, React, clean interfaces, and responsive frontend development.",
-  "Interested in turning small ideas into useful, Website , apps and software that make live easier.",
-];
-
-function InteractiveBackdrop() {
-  const backdropRef = useRef(null);
-
-  useEffect(() => {
-    const backdrop = backdropRef.current;
-    if (!backdrop) return undefined;
-
-    let frame = 10;
-    let pointerX = 0.22;
-    let pointerY = 0.34;
-    let scrollY = window.scrollY;
-
-    const update = () => {
-      frame = 0;
-      backdrop.style.setProperty("--cursor-x", `${pointerX * 100}%`);
-      backdrop.style.setProperty("--cursor-y", `${pointerY * 100}%`);
-      backdrop.style.setProperty("--drift-x", `${(pointerX - 0.5) * 34}px`);
-      backdrop.style.setProperty("--drift-y", `${(pointerY - 0.5) * 26}px`);
-      backdrop.style.setProperty("--reverse-drift-x", `${(pointerX - 0.5) * -24}px`);
-      backdrop.style.setProperty("--reverse-drift-y", `${(pointerY - 0.5) * -12}px`);
-      backdrop.style.setProperty("--scroll-shift", `${scrollY * -0.045}px`);
-    };
-
-    const scheduleUpdate = () => {
-      if (frame) return;
-      frame = window.requestAnimationFrame(update);
-    };
-
-    const handlePointerMove = (event) => {
-      pointerX = event.clientX / window.innerWidth;
-      pointerY = event.clientY / window.innerHeight;
-      scheduleUpdate();
-    };
-
-    const handleScroll = () => {
-      scrollY = window.scrollY;
-      scheduleUpdate();
-    };
-
-    update();
-    window.addEventListener("pointermove", handlePointerMove, { passive: true });
-    window.addEventListener("scroll", handleScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener("pointermove", handlePointerMove);
-      window.removeEventListener("scroll", handleScroll);
-      if (frame) window.cancelAnimationFrame(frame);
-    };
-  }, []);
-
-  return <div ref={backdropRef} className="interactive-backdrop" aria-hidden="true" />;
+/* Shared SVG filters and gradients used by every painted stroke. */
+function PaintDefs() {
+  return (
+    <svg width="0" height="0" aria-hidden="true" style={{ position: "absolute" }}>
+      <defs>
+        <filter id="paint" x="-15%" y="-15%" width="130%" height="130%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.016 0.045" numOctaves="3" seed="7" result="n" />
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="24" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+        <filter id="paint-soft" x="-15%" y="-15%" width="130%" height="130%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.03 0.08" numOctaves="2" seed="3" result="n" />
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="10" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+        <filter id="grain" x="0" y="0" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" stitchTiles="stitch" />
+          <feColorMatrix values="0 0 0 0 0.09  0 0 0 0 0.08  0 0 0 0 0.07  1.3 0 0 0 -0.5" />
+        </filter>
+        <Gradient id="g-orange" from="#E8501A" to="#F7B32B" />
+        <Gradient id="g-tone" from="#B8380B" to="#F7A15E" />
+        <Gradient id="g-teal" from="#0F6E78" to="#2BB3B1" />
+        <Gradient id="g-blue" from="#2D4BB0" to="#2BB3B1" />
+        <Gradient id="g-gold" from="#F7B32B" to="#F26B1D" diagonal />
+      </defs>
+    </svg>
+  );
 }
 
-function SectionHeader({ kicker, title }) {
+function Gradient({ id, from, to, diagonal = false }) {
   return (
-    <div className="section-header">
-      <p className="section-kicker">{kicker}</p>
-      <h2 className="section-title">{title}</h2>
+    <linearGradient id={id} x1="0" y1="0" x2="1" y2={diagonal ? "1" : "0"}>
+      <stop offset="0" stopColor={from} />
+      <stop offset="1" stopColor={to} />
+    </linearGradient>
+  );
+}
+
+function Stroke({ d, color, width, opacity, className, delay, ...rest }) {
+  return (
+    <path
+      className={className}
+      pathLength={className ? 1 : undefined}
+      d={d}
+      fill="none"
+      stroke={color}
+      strokeWidth={width}
+      strokeLinecap="round"
+      filter="url(#paint)"
+      opacity={opacity}
+      style={delay ? { "--d": delay } : undefined}
+      {...rest}
+    />
+  );
+}
+
+/* ---------- Nav: full glass bar that tightens into a pill on scroll ---------- */
+function TopBar({ section, compact }) {
+  const linksRef = useRef(null);
+  const [indicator, setIndicator] = useState(null);
+
+  useLayoutEffect(() => {
+    const measure = () => {
+      const link = linksRef.current?.querySelector(`a[href="#${section}"]`);
+      setIndicator(link ? { x: link.offsetLeft, w: link.offsetWidth } : null);
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [section]);
+
+  return (
+    <header className={`glass topbar${compact ? " is-compact" : ""}`}>
+      <a href="#top" className="brand">
+        <svg viewBox="0 0 40 40" width="30" height="30" aria-hidden="true">
+          <path d="M20,3 C30,3 37,10 37,20 C37,30 30,37 20,37 C10,37 3,30 3,20 C3,10 10,3 20,3 Z" fill="url(#g-orange)" filter="url(#paint-soft)" />
+          <circle cx="16" cy="19" r="2.4" fill="#161513" />
+          <circle cx="24" cy="19" r="2.4" fill="#161513" />
+        </svg>
+        <span className="display brand-name">
+          Charles<span className="brand-dot">.</span>
+        </span>
+      </a>
+      <nav className="nav-links" aria-label="Sections" ref={linksRef}>
+        <span
+          className={`nav-ind${indicator ? " is-on" : ""}`}
+          aria-hidden="true"
+          style={indicator ? { "--ind-x": `${indicator.x}px`, "--ind-w": `${indicator.w}px` } : undefined}
+        />
+        {navItems.map((item) => (
+          <a key={item.id} href={`#${item.id}`} aria-current={section === item.id ? "true" : undefined}>
+            {item.label}
+          </a>
+        ))}
+      </nav>
+      <a href="#contact" className="btn-ink small">
+        <span>Say hi</span>
+      </a>
+    </header>
+  );
+}
+
+function Wave({ talking }) {
+  return (
+    <span className={`wave${talking ? " is-talking" : ""}`} aria-hidden="true">
+      <span />
+      <span />
+      <span />
+      <span />
+      <span />
+    </span>
+  );
+}
+
+/* ---------- Hero ---------- */
+function Hero({ motion }) {
+  return (
+    <section id="top" data-stop="hero" className="hero">
+      <svg className="paint-art hero-art drift paint-layer" viewBox="0 0 900 800" aria-hidden="true">
+        <Stroke className="stroke-in" delay=".2s" d="M60,560 C210,330 420,200 640,160 C770,136 850,170 890,220" color="url(#g-orange)" width="130" />
+        <Stroke className="stroke-in" delay=".4s" d="M60,560 C210,330 420,200 640,160 C770,136 850,170 890,220" color="#FFFFFF" width="110" opacity=".16" strokeDasharray="0.004 0.02" />
+        <Stroke className="stroke-in" delay=".6s" d="M180,720 C360,580 570,540 880,580" color="url(#g-tone)" width="58" opacity=".9" />
+        <Stroke className="stroke-in" delay=".9s" d="M380,110 C500,80 620,100 730,50" color="#F7A15E" width="16" opacity=".75" />
+        {[
+          [300, 250, 16, "#F26B1D", "1.1s"],
+          [258, 292, 7, "#F26B1D", "1.15s"],
+          [820, 420, 22, "#F7A15E", "1.2s"],
+          [772, 470, 8, "#B8380B", "1.25s"],
+          [520, 420, 5, "#E8501A", "1.3s"],
+          [680, 330, 11, "#F7A15E", "1.35s"],
+          [150, 420, 6, "#B8380B", "1.4s"],
+        ].map(([cx, cy, r, fill, d]) => (
+          <circle key={`${cx}-${cy}`} className="pop" cx={cx} cy={cy} r={r} fill={fill} style={{ "--d": d }} />
+        ))}
+      </svg>
+
+      <div className="container">
+        <div className="hero-row">
+          <div className="hero-copy">
+            <h1 className="display hero-title">
+              <span className="rise" style={{ "--d": ".1s" }}>Small ideas,</span>
+              <span className="rise" style={{ "--d": ".22s" }}>painted into</span>
+              <span className="rise" style={{ "--d": ".34s" }}>
+                <span className="underlined">
+                  <em className="serif accent">useful</em>
+                  <svg viewBox="0 0 300 30" preserveAspectRatio="none" aria-hidden="true">
+                    <path className="stroke-in" pathLength="1" d="M6,20 C70,8 160,6 294,16" fill="none" strokeWidth="9" strokeLinecap="round" filter="url(#paint-soft)" style={{ "--d": "1s" }} />
+                  </svg>
+                </span>{" "}
+                software.
+              </span>
+            </h1>
+            <p className="rise hero-intro" style={{ "--d": ".5s" }}>
+              I'm a Software Engineering student building websites, apps and tools with Python, JavaScript and React — clean interfaces that make life a little easier.
+            </p>
+            <div className="rise hero-actions" style={{ "--d": ".62s" }}>
+              <a href="#projects" className="btn-ink">
+                <span>See my work</span>
+                <ArrowDown size={18} aria-hidden="true" />
+              </a>
+              <a href="#contact" className="btn-glass glass">Say hi</a>
+            </div>
+            <div className="rise hero-social" style={{ "--d": ".74s" }}>
+              <a href={profile.github} className="icon-link" aria-label="Charles on GitHub"><Github size={22} strokeWidth={1.8} /></a>
+              <a href={profile.linkedin} className="icon-link" aria-label="Charles on LinkedIn"><Linkedin size={22} strokeWidth={1.8} /></a>
+              <a href={`mailto:${profile.email}`} className="icon-link" aria-label="Email Charles"><Mail size={22} strokeWidth={1.8} /></a>
+            </div>
+          </div>
+
+          <div className="hero-guide">
+            <div className="glass rise hello" style={{ "--d": "1.2s" }}>
+              <div className="hello-head">
+                <span className="mono" style={{ fontSize: 12 }}>Bob · your guide</span>
+                <Wave talking />
+              </div>
+              <p>Hey — I'm Bob, a drop of paint that slipped off Charles's canvas. Come along, I'll show you around.</p>
+              <a href="#about" className="text-link" style={{ fontSize: 15 }}>
+                Show me around
+                <ArrowDown size={16} aria-hidden="true" />
+              </a>
+            </div>
+            <div className="rise hero-bob" style={{ "--d": ".9s" }}>
+              <Bob mood="hero" size={300} motion={motion} />
+              <div className="drip-cue" aria-hidden="true">
+                <span className="drip-trail" />
+                <svg className="drip-drop" viewBox="0 0 22 30" aria-hidden="true">
+                  <path d="M11,1 C14,8 20,14 20,20 C20,25.5 16,29 11,29 C6,29 2,25.5 2,20 C2,14 8,8 11,1 Z" fill="#E8501A" />
+                  <path d="M7,18 C7,15 8.5,13 10,11.5" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" opacity=".7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="hero-spacer" aria-hidden="true" />
+      </div>
+    </section>
+  );
+}
+
+function Marquee() {
+  const items = [...marquee, ...marquee];
+  return (
+    <div className="marquee" aria-hidden="true">
+      <div className="marquee-track display">
+        {items.map((item, i) => (
+          <React.Fragment key={i}>
+            <span className={item.style === "outline" ? "outline" : item.style === "serif" ? "serif" : undefined}>{item.text}</span>
+            <span className="marquee-dot" style={{ background: item.dot }} />
+          </React.Fragment>
+        ))}
+      </div>
     </div>
   );
 }
 
-function DesktopNavigation() {
+/* ---------- About ---------- */
+function About() {
+  const [photoOk, setPhotoOk] = useState(true);
   return (
-    <aside className="fixed right-9 top-1/2 z-40 hidden -translate-y-1/2 md:block">
-      <nav aria-label="Section navigation">
-        <ul className="grid gap-3 text-right">
-          {navItems.map((item) => (
-            <li key={item.href}>
-              <a
-                href={item.href}
-                className="nav-link inline-flex justify-end text-sm font-bold text-mint transition hover:translate-x-1 hover:text-[#ccd6f6]"
-              >
-                /{item.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </aside>
+    <section id="about" data-stop="about" className="section about">
+      <svg className="paint-art about-art drift-up paint-layer" viewBox="0 0 700 600" aria-hidden="true">
+        <Stroke d="M40,420 C180,300 330,330 470,220 C560,150 640,140 680,160" color="url(#g-orange)" width="96" />
+        <Stroke d="M120,540 C260,480 380,520 560,430" color="url(#g-tone)" width="22" opacity=".8" />
+        <circle cx="600" cy="300" r="14" fill="#F7A15E" />
+        <circle cx="560" cy="330" r="6" fill="#F7A15E" />
+      </svg>
+      <div className="container">
+        <p className="mono reveal" style={{ margin: "0 0 28px" }}>01 — About</p>
+        <div className="about-row">
+          <div className="about-main">
+            <h2 className="display reveal about-statement">
+              I'm Charles. I study Software Engineering at Pan-Atlantic University, and I like turning <em className="serif accent">small ideas</em> into websites, apps and software that make life easier.
+            </h2>
+            <div className="glass reveal facts">
+              {highlights.map((text, i) => (
+                <div className="fact" key={text}>
+                  <span className="mono">{String(i + 1).padStart(2, "0")}</span>
+                  <p>{text}</p>
+                </div>
+              ))}
+              <div className="fact-grid">
+                <div><p className="mono label">Studying</p><p className="value">{profile.school}</p></div>
+                <div><p className="mono label">Focus</p><p className="value">Frontend &amp; UI</p></div>
+                <div><p className="mono label">Stack</p><p className="value">Python · JS · React</p></div>
+              </div>
+            </div>
+          </div>
+          <div className="reveal portrait-col">
+            <figure className="glass lift portrait">
+              <div className="portrait-frame">
+                <svg className="art" viewBox="0 0 400 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                  <Stroke d="M-20,140 C90,60 220,120 420,40" color="url(#g-orange)" width="110" />
+                  <Stroke d="M-30,330 C120,270 240,380 430,300" color="url(#g-teal)" width="140" />
+                  <Stroke d="M40,470 C160,430 260,480 380,440" color="#2D4BB0" width="40" opacity=".85" />
+                  <circle cx="300" cy="200" r="18" fill="#D6336C" />
+                  <circle cx="90" cy="230" r="8" fill="#F7B32B" />
+                </svg>
+                {photoOk && (
+                  <img src={profile.avatar} alt={`Portrait of ${profile.name}`} loading="lazy" onError={() => setPhotoOk(false)} />
+                )}
+              </div>
+              <figcaption>
+                <span className="display portrait-name">{profile.name}</span>
+                <span className="mono" style={{ fontSize: 11 }}>SWE Student</span>
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
-function SocialRail() {
+/* ---------- Skills ---------- */
+function Skills() {
   return (
-    <aside className="fixed bottom-7 right-9 z-40 hidden md:block">
-      <div className="flex items-center gap-3 text-mint">
-        <a
-          href={`mailto:${profile.email}`}
-          className="icon-link"
-          aria-label="Email Charles"
-        >
-          <Mail size={18} />
-        </a>
-        <a
-          href={profile.github}
-          target="_blank"
-          rel="noreferrer"
-          className="icon-link"
-          aria-label="Charles on GitHub"
-        >
-          <Github size={18} />
-        </a>
-        <a
-          href={profile.linkedin}
-          target="_blank"
-          rel="noreferrer"
-          className="icon-link"
-          aria-label="Charles on LinkedIn"
-        >
-          <Linkedin size={18} />
+    <section id="skills" data-stop="skills" className="section skills">
+      <svg className="paint-art skills-art drift paint-layer" viewBox="0 0 800 500" aria-hidden="true">
+        <Stroke d="M60,300 C200,160 380,120 560,180 C660,214 730,200 790,150" color="url(#g-orange)" width="120" />
+        <Stroke d="M200,440 C340,380 500,420 760,360" color="#B8380B" width="34" opacity=".8" />
+        <circle cx="140" cy="140" r="12" fill="#F7A15E" />
+        <circle cx="110" cy="176" r="5" fill="#F7A15E" />
+      </svg>
+      <div className="container">
+        <p className="mono reveal kicker">02 — Toolbox</p>
+        <h2 className="display reveal big-title">
+          The brushes I <em className="serif accent">paint</em> with.
+        </h2>
+        <div className="skill-grid">
+          {skillGroups.map((group) => {
+            const Icon = ICONS[group.icon];
+            return (
+              <article className="glass lift reveal skill-card" key={group.title}>
+                <div className="skill-card-head">
+                  <span className="skill-badge" style={{ background: group.badge.color, borderRadius: group.badge.radius }}>
+                    <Icon size={24} strokeWidth={1.8} aria-hidden="true" />
+                  </span>
+                  <span className="mono" style={{ fontSize: 11 }}>{String(group.skills.length).padStart(2, "0")} items</span>
+                </div>
+                <h3 className="display">{group.title}</h3>
+                <div className="chips">
+                  {group.skills.map((skill) => <span className="chip" key={skill}>{skill}</span>)}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- Projects ---------- */
+function ProjectCover({ type }) {
+  if (type === "browser") {
+    return (
+      <div className="project-cover" style={{ background: "#F4DCCB" }}>
+        <div className="art">
+          <svg viewBox="0 0 600 420" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <Stroke d="M-40,300 C120,160 300,120 640,140" color="url(#g-orange)" width="150" />
+            <Stroke d="M-20,420 C180,360 380,400 640,330" color="url(#g-teal)" width="70" />
+            <circle cx="520" cy="70" r="18" fill="#D6336C" /><circle cx="560" cy="100" r="7" fill="#D6336C" />
+          </svg>
+          <div className="glass" style={{ position: "absolute", left: "16%", top: "16%", width: "68%", height: "66%", borderRadius: 20, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+            <div style={{ display: "flex", gap: 7, padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.6)" }}>
+              {["#E8501A", "#F7B32B", "#2BB3B1"].map((c) => <span key={c} style={{ width: 11, height: 11, borderRadius: "50%", background: c }} />)}
+            </div>
+            <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 18, padding: "18px 22px" }}>
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 10 }}>
+                <span style={{ height: 14, width: "80%", borderRadius: 8, background: "rgba(22,21,19,.82)" }} />
+                <span style={{ height: 14, width: "56%", borderRadius: 8, background: "rgba(22,21,19,.82)" }} />
+                <span style={{ height: 8, width: "70%", borderRadius: 8, background: "rgba(22,21,19,.25)", marginTop: 6 }} />
+                <span style={{ height: 8, width: "60%", borderRadius: 8, background: "rgba(22,21,19,.25)" }} />
+              </div>
+              <svg viewBox="0 0 40 40" width="64" height="64" aria-hidden="true">
+                <path d="M20,3 C30,3 37,10 37,20 C37,30 30,37 20,37 C10,37 3,30 3,20 C3,10 10,3 20,3 Z" fill="url(#g-orange)" filter="url(#paint-soft)" />
+                <circle cx="16" cy="19" r="2.4" fill="#161513" /><circle cx="24" cy="19" r="2.4" fill="#161513" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  if (type === "script") {
+    return (
+      <div className="project-cover" style={{ background: "#D5ECE9" }}>
+        <div className="art">
+          <svg viewBox="0 0 600 420" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <path d="M300,60 C420,60 500,140 500,220 C500,320 400,380 300,370 C190,360 110,300 110,210 C110,120 190,60 300,60 Z" fill="url(#g-gold)" filter="url(#paint)" />
+            <Stroke d="M-30,120 C100,80 180,140 300,100" color="#0F6E78" width="40" />
+            <Stroke d="M330,400 C430,360 520,390 640,340" color="#D6336C" width="30" />
+            <circle cx="80" cy="330" r="16" fill="#2D4BB0" /><circle cx="120" cy="360" r="6" fill="#2D4BB0" /><circle cx="540" cy="80" r="10" fill="#0F6E78" />
+          </svg>
+          <span className="display" aria-hidden="true" style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "clamp(120px, 14vw, 200px)", fontWeight: 800, letterSpacing: "-0.06em", color: "#0B4F57", lineHeight: 1 }}>{"{ }"}</span>
+          <span className="glass mono" style={{ position: "absolute", right: 22, bottom: 22, padding: "8px 14px", borderRadius: 999, fontSize: 12, color: "#161513" }}>script.js</span>
+        </div>
+      </div>
+    );
+  }
+  const paper = { position: "absolute", left: "50%", top: "50%", width: "46%", aspectRatio: "3 / 4", borderRadius: 12, background: "#FBFAF7", boxShadow: "0 18px 40px -14px rgba(22,21,19,.35)" };
+  const line = (width, extra) => ({ height: 6, width, borderRadius: 6, background: "rgba(22,21,19,.18)", ...extra });
+  return (
+    <div className="project-cover" style={{ background: "#DDE2F5" }}>
+      <div className="art">
+        <svg viewBox="0 0 600 420" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <Stroke d="M-40,160 C120,100 260,200 640,90" color="url(#g-blue)" width="130" />
+          <Stroke d="M-20,380 C160,330 340,390 640,320" color="#F7B32B" width="44" />
+          <circle cx="500" cy="330" r="14" fill="#E8501A" />
+        </svg>
+        <div style={{ ...paper, transform: "translate(-62%, -50%) rotate(-9deg)" }} />
+        <div style={{ ...paper, transform: "translate(-40%, -50%) rotate(5deg)" }} />
+        <div style={{ ...paper, background: "#FFFFFF", boxShadow: "0 22px 50px -14px rgba(22,21,19,.4)", transform: "translate(-50%, -50%) rotate(-1.5deg)", boxSizing: "border-box", padding: "9% 10%", display: "flex", flexDirection: "column", gap: 9 }}>
+          <span className="mono" style={{ fontSize: 10, color: "#2D4BB0" }}>Assignment 04</span>
+          <span style={{ height: 10, width: "85%", borderRadius: 6, background: "#161513" }} />
+          <span style={line("100%", { marginTop: 6 })} />
+          <span style={line("92%")} />
+          <span style={line("96%")} />
+          <span style={line("60%")} />
+          <span style={{ height: 34, width: "100%", borderRadius: 8, background: "#2D4BB0", opacity: 0.85, marginTop: 8 }} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Projects() {
+  return (
+    <section id="projects" data-stop="projects" className="section projects">
+      <div className="container">
+        <p className="mono reveal kicker">03 — Selected work</p>
+        <h2 className="display reveal big-title">
+          Things I've <em className="serif accent">made</em>.
+        </h2>
+        <div className="project-list">
+          {projects.map((project, i) => (
+            <article className={`project glass lift reveal${i % 2 ? " flip" : ""}`} key={project.title}>
+              <ProjectCover type={project.cover} />
+              <div className="project-body">
+                <span className="num" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+                <h3 className="display">{project.title}</h3>
+                <p>{project.description}</p>
+                <div className="chips">
+                  {project.tech.map((t) => <span className="chip" key={t}>{t}</span>)}
+                </div>
+                <div className="project-links">
+                  {project.links.map((link) => (
+                    <a key={link.label} href={link.href} className="text-link">
+                      {link.label}
+                      <ArrowUpRight size={16} aria-hidden="true" />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- Education ---------- */
+function Education() {
+  const details = [
+    { label: "Years", value: profile.years },
+    { label: "Programme", value: profile.degree },
+  ].filter((d) => d.value);
+  return (
+    <section id="education" data-stop="education" className="section education">
+      <svg className="paint-art edu-art drift-up paint-layer" viewBox="0 0 900 400" aria-hidden="true">
+        <Stroke d="M40,260 C220,120 420,300 620,170 C720,110 820,120 880,150" color="url(#g-orange)" width="110" />
+        <circle cx="140" cy="110" r="14" fill="#F26B1D" />
+      </svg>
+      <div className="container">
+        <p className="mono reveal" style={{ margin: "0 0 28px" }}>04 — Education</p>
+        <article className="glass reveal edu-card">
+          <span className="edu-badge">
+            <GraduationCap size={52} strokeWidth={1.6} aria-hidden="true" />
+          </span>
+          <div className="edu-main">
+            <p className="mono" style={{ margin: 0, color: "#2D4BB0" }}>Currently studying</p>
+            <h3 className="display">{profile.school}</h3>
+            <p style={{ margin: 0, fontSize: 22, fontWeight: 600 }}>{profile.programme}</p>
+            <p style={{ margin: "14px 0 0", maxWidth: 560, fontSize: 18, color: "#3D3A34" }}>
+              Programming assignments, documentation and collaborative software engineering projects — the foundations under everything else on this page.
+            </p>
+          </div>
+          {details.length > 0 && (
+            <div className="edu-side">
+              {details.map((d) => (
+                <div key={d.label}>
+                  <p className="mono label">{d.label}</p>
+                  <p className="value" style={{ fontSize: 18 }}>{d.value}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </article>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- Contact ---------- */
+function Contact() {
+  return (
+    <section id="contact" data-stop="contact" className="section contact">
+      <svg className="paint-art contact-art drift paint-layer" viewBox="0 0 900 700" aria-hidden="true">
+        <Stroke d="M80,520 C260,300 440,420 600,240 C700,130 800,110 880,140" color="url(#g-orange)" width="140" />
+        <Stroke d="M240,660 C420,560 600,620 880,500" color="url(#g-tone)" width="54" />
+        <circle cx="200" cy="300" r="18" fill="#F7A15E" /><circle cx="240" cy="340" r="7" fill="#F7A15E" /><circle cx="760" cy="380" r="10" fill="#B8380B" />
+      </svg>
+      <div className="container">
+        <p className="mono reveal" style={{ margin: "0 0 24px" }}>05 — Contact</p>
+        <h2 className="display reveal contact-title">
+          Let's make<br />something <em className="serif accent">vivid</em>.
+        </h2>
+        <p className="reveal" style={{ margin: "36px 0 0", maxWidth: 520, fontSize: 20, color: "#3D3A34" }}>
+          Got an idea, a role, or just want to talk code? My inbox is open.
+        </p>
+        <a href={`mailto:${profile.email}`} className="mail-link display reveal contact-email">{profile.email}</a>
+        <div className="reveal hero-actions">
+          <a href={profile.github} className="btn-glass glass"><Github size={20} strokeWidth={1.8} aria-hidden="true" />GitHub</a>
+          <a href={profile.linkedin} className="btn-glass glass"><Linkedin size={20} strokeWidth={1.8} aria-hidden="true" />LinkedIn</a>
+          <a href={`mailto:${profile.email}`} className="btn-ink"><span>Send an email</span></a>
+        </div>
+        <footer className="footer">
+          <span className="mono" style={{ fontSize: 12 }}>© {new Date().getFullYear()} {profile.name}</span>
+          <span className="mono" style={{ fontSize: 12 }}>Painted &amp; coded with React</span>
+          <a href="#top" className="text-link" style={{ fontSize: 15 }}>
+            Back to top
+            <ArrowUp size={16} aria-hidden="true" />
+          </a>
+        </footer>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- Bob's tour: the corner guide that narrates each section ---------- */
+function Guide({ section, motion }) {
+  const [minimized, setMinimized] = useState(false);
+  const [talking, setTalking] = useState(false);
+  const stop = tourStops[section] || tourStops.hero;
+
+  useEffect(() => {
+    if (section === "hero") return undefined;
+    setTalking(true);
+    const t = window.setTimeout(() => setTalking(false), 2200);
+    return () => window.clearTimeout(t);
+  }, [section]);
+
+  const classes = ["guide", section !== "hero" && "is-on", minimized && "is-min"].filter(Boolean).join(" ");
+  return (
+    <aside className={classes} aria-label="Bob, your tour guide" aria-live="polite">
+      <button className="guide-bob" type="button" onClick={() => setMinimized(false)} aria-label="Show Bob's tour note">
+        <Bob mood={section} size={96} motion={motion} />
+      </button>
+      <div className="guide-bubble glass">
+        <div className="guide-head">
+          <span className="mono" style={{ fontSize: 11, flex: 1 }}>Bob · stop {stop.step} of 5</span>
+          <Wave talking={talking} />
+          <button className="guide-x" type="button" onClick={() => setMinimized(true)} aria-label="Hide Bob's tour note">
+            <X size={16} aria-hidden="true" />
+          </button>
+        </div>
+        <p className="guide-line">{stop.line}</p>
+        <a href={stop.next} className="text-link" style={{ fontSize: 14 }}>
+          {stop.nextLabel}
+          <ArrowDown size={14} aria-hidden="true" />
         </a>
       </div>
     </aside>
   );
 }
 
-function Typewriter({ text, speed = 80, delay = 0 }) {
-  const [displayedText, setDisplayedText] = useState("");
-  const [started, setStarted] = useState(false);
-
-  useEffect(() => {
-    const startTimeout = setTimeout(() => setStarted(true), delay);
-    return () => clearTimeout(startTimeout);
-  }, [delay]);
-
-  useEffect(() => {
-    if (!started) return;
-    if (displayedText.length < text.length) {
-      const timeout = setTimeout(() => {
-        setDisplayedText(text.slice(0, displayedText.length + 1));
-      }, speed);
-      return () => clearTimeout(timeout);
-    }
-  }, [displayedText, text, speed, started]);
-
-  return <span>{displayedText}</span>;
-}
-
-function TiltPortrait({ children }) {
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const containerRef = useRef(null);
-
-  const handleMouseMove = (e) => {
-    if (!containerRef.current) return;
-    const { left, top, width, height } = containerRef.current.getBoundingClientRect();
-    const x = (e.clientX - left) / width - 0.5;
-    const y = (e.clientY - top) / height - 0.5;
-    setTilt({ x: x * 20, y: y * -20 });
-  };
-
-  const handleMouseLeave = () => {
-    setTilt({ x: 0, y: 0 });
-  };
+export default function App() {
+  const { section, compact } = useScrollScene();
+  const motion = !useReducedMotion();
 
   return (
-    <div
-      ref={containerRef}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      style={{
-        transform: `rotateY(${tilt.x}deg) rotateX(${tilt.y}deg)`,
-        transition: "transform 0.1s ease-out",
-      }}
-      className="portrait-wrap mb-8 animate-fade-in-up opacity-0"
-    >
-      {children}
-    </div>
-  );
-}
-
-function ScrollReveal({ children, className = "", id }) {
-  const [isVisible, setVisible] = useState(false);
-  const domRef = useRef();
-
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1 });
-
-    const currentRef = domRef.current;
-    if (currentRef) observer.observe(currentRef);
-
-    return () => {
-      if (currentRef) observer.unobserve(currentRef);
-    };
-  }, []);
-
-  return (
-    <div
-      id={id}
-      ref={domRef}
-      className={`${className} reveal ${isVisible ? "is-visible" : ""}`}
-    >
-      {children}
-    </div>
-  );
-}
-
-function App() {
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  const closeMenu = () => setMenuOpen(false);
-
-  return (
-    <div className="site-shell min-h-screen overflow-hidden bg-navy text-slate-light">
-      <InteractiveBackdrop />
-      <DesktopNavigation />
-      <SocialRail />
-
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-line bg-[#0a192f]/90 backdrop-blur md:hidden">
-        <nav className="flex items-center justify-between px-5 py-4">
-          <a
-            href="#top"
-            className="font-mono text-sm font-bold text-mint"
-            onClick={closeMenu}
-          >
-            charles.chukwurah
-          </a>
-          <button
-            type="button"
-            className="grid h-10 w-10 place-items-center rounded border border-[#64ffda]/50 text-mint"
-            onClick={() => setMenuOpen((isOpen) => !isOpen)}
-            aria-label="Toggle navigation menu"
-            aria-expanded={menuOpen}
-          >
-            {menuOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-        </nav>
-
-        {menuOpen ? (
-          <div className="border-t border-slate-line bg-navy px-5 py-3">
-            <div className="grid gap-1">
-              {navItems.map((item) => (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  className="rounded px-3 py-3 font-mono text-sm font-bold text-mint hover:bg-[#112240]"
-                  onClick={closeMenu}
-                >
-                  /{item.label}
-                </a>
-              ))}
-            </div>
-          </div>
-        ) : null}
-      </header>
-
-      <main id="top" className="relative z-10">
-        <section className="hero-section mx-auto flex min-h-screen max-w-6xl flex-col justify-center px-6 pb-20 pt-28 md:px-12 md:pb-24 md:pt-24 lg:px-20">
-          <div className="max-w-4xl">
-            <TiltPortrait>
-              <div className="portrait-glow" aria-hidden="true" />
-              <img
-                src={profile.avatar}
-                alt="Charles Chukwurah"
-                className="portrait-image"
-              />
-            </TiltPortrait>
-
-            <p className="mb-3 font-mono text-base text-mint sm:text-lg animate-fade-in-up delay-100 opacity-0">hi,</p>
-            <h1 className="hero-title text-[clamp(3rem,9vw,6.5rem)] font-bold leading-[0.98] text-slate-light animate-fade-in-up delay-200 opacity-0">
-              <span className="text-mint">
-                <Typewriter text={profile.firstName} delay={1000} />
-              </span>{" "}
-              <Typewriter text="here." delay={1800} />
-              <span className="typing-caret" aria-hidden="true" />
-            </h1>
-            <p className="mt-4 text-[clamp(2rem,5vw,4.5rem)] font-semibold leading-none text-slate animate-fade-in-up delay-300 opacity-0">
-              <Typewriter text="I build stuff sometimes." delay={2800} speed={50} />
-            </p>
-            <p className="mt-8 max-w-2xl text-lg leading-8 text-slate animate-fade-in-up delay-500 opacity-0">
-              I am a {profile.title.toLowerCase()} at {profile.school}, currently growing my
-              foundations in Python, JavaScript, React, interface design, and practical software
-              engineering.
-            </p>
-
-            <div className="mt-9 flex flex-col gap-4 sm:flex-row animate-fade-in-up delay-700 opacity-0">
-              <a href={`mailto:${profile.email}`} className="primary-action">
-                <Mail size={18} />
-                Say hello
-              </a>
-              <a
-                href={profile.github}
-                target="_blank"
-                rel="noreferrer"
-                className="secondary-action"
-              >
-                <Github size={18} />
-                View GitHub
-              </a>
-            </div>
-          </div>
-        </section>
-
-        <ScrollReveal id="about" className="content-section">
-          <SectionHeader kicker="01. about" title="A student engineer with a builder's rhythm." />
-          <div className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
-            <div className="space-y-5 text-lg leading-8 text-slate">
-              <p>
-                I am Charles Chukwurah, a software engineering student at Pan-Atlantic University.
-                I am using this portfolio to document the projects, coursework, and practice that
-                are shaping how I write software.
-              </p>
-              <p>
-                Right now I am focused on frontend development, clean UI implementation, and the
-                discipline of turning small ideas into reliable, readable code.
-              </p>
-            </div>
-
-            <div className="grid gap-4">
-              {highlights.map((item) => (
-                <article key={item} className="feature-card">
-                  <Sparkles className="text-mint" size={20} />
-                  <p>{item}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </ScrollReveal>
-
-        <ScrollReveal id="skills" className="content-section">
-          <SectionHeader kicker="02. skills" title="Tools and concepts I keep sharpening." />
-          <div className="grid gap-5 md:grid-cols-3">
-            {skillGroups.map(({ title, icon: Icon, skills }) => (
-              <article key={title} className="skill-card">
-                <div className="mb-6 flex items-center justify-between">
-                  <Icon className="text-mint" size={26} />
-                  <span className="font-mono text-sm text-slate">/{title.toLowerCase()}</span>
-                </div>
-                <h3 className="text-2xl font-bold text-slate-light">{title}</h3>
-                <ul className="mt-6 grid gap-3">
-                  {skills.map((skill) => (
-                    <li key={skill} className="skill-item">
-                      {skill}
-                    </li>
-                  ))}
-                </ul>
-              </article>
-            ))}
-          </div>
-        </ScrollReveal>
-
-        <ScrollReveal id="projects" className="content-section">
-          <SectionHeader kicker="03. projects" title="Software creations and practice work." />
-          <div className="grid gap-5 lg:grid-cols-3">
-            {projects.map((project) => (
-              <article key={project.title} className="project-card">
-                <div className="mb-7 flex items-center justify-between text-mint">
-                  <BookOpen size={30} />
-                  <div className="flex items-center gap-3">
-                    <a
-                      href={project.github}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="icon-link"
-                      aria-label={`${project.title} source code`}
-                    >
-                      <Github size={18} />
-                    </a>
-                    {project.live !== "#" ? (
-                      <a
-                        href={project.live}
-                        className="icon-link"
-                        aria-label={`${project.title} live view`}
-                      >
-                        <ExternalLink size={18} />
-                      </a>
-                    ) : null}
-                  </div>
-                </div>
-                <h3 className="text-2xl font-bold text-slate-light">{project.title}</h3>
-                <p className="mt-4 min-h-32 text-base leading-7 text-slate">{project.description}</p>
-                <div className="mt-6 flex flex-wrap gap-x-4 gap-y-2 font-mono text-sm text-slate">
-                  {project.tech.map((tech) => (
-                    <span key={tech}>{tech}</span>
-                  ))}
-                </div>
-              </article>
-            ))}
-          </div>
-        </ScrollReveal>
-
-        <ScrollReveal id="education" className="content-section">
-          <SectionHeader kicker="04. education" title="Academic foundation and current focus." />
-          <article className="education-panel">
-            <div className="grid h-14 w-14 place-items-center rounded bg-mint text-navy">
-              <GraduationCap size={30} />
-            </div>
-            <div>
-              <p className="font-mono text-sm text-mint">currently studying</p>
-              <h3 className="mt-3 text-3xl font-bold text-slate-light">{profile.school}</h3>
-              <p className="mt-2 text-xl font-semibold text-slate">{profile.title}</p>
-              <p className="mt-6 max-w-3xl text-lg leading-8 text-slate">
-                Coursework and self-directed practice are helping me build a stronger foundation in
-                programming, software design, collaboration, documentation, and modern web
-                development.
-              </p>
-            </div>
-          </article>
-        </ScrollReveal>
-
-        <ScrollReveal id="contact" className="content-section pb-28 text-center">
-          <p className="font-mono text-base text-mint">05. contact</p>
-          <h2 className="mx-auto mt-4 max-w-3xl text-4xl font-bold text-slate-light sm:text-5xl">
-            Let us build something useful.
-          </h2>
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-slate">
-            I am open to student projects, internships, and conversations around frontend
-            development or software engineering practice.
-          </p>
-          <div className="mt-9 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <a href={`mailto:${profile.email}`} className="primary-action">
-              <Send size={18} />
-              Email me
-            </a>
-            <a
-              href={profile.linkedin}
-              target="_blank"
-              rel="noreferrer"
-              className="secondary-action"
-            >
-              <Linkedin size={18} />
-              Connect
-              <ArrowUpRight size={16} />
-            </a>
-          </div>
-        </ScrollReveal>
+    <div className="site">
+      <a className="skip-link" href="#about">Skip to content</a>
+      <PaintDefs />
+      <TopBar section={section} compact={compact} />
+      <main>
+        <Hero motion={motion} />
+        <Marquee />
+        <About />
+        <Skills />
+        <Projects />
+        <Education />
+        <Contact />
       </main>
-
-      <footer className="relative z-10 border-t border-slate-line px-6 py-8 text-center font-mono text-sm text-slate">
-        <p>Built by Charles Chukwurah with React and Tailwind CSS.</p>
-      </footer>
+      <Guide section={section} motion={motion} />
+      <svg className="grain" aria-hidden="true">
+        <rect width="100%" height="100%" filter="url(#grain)" />
+      </svg>
     </div>
   );
 }
-
-export default App;
