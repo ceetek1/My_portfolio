@@ -46,33 +46,76 @@ export const skillGroups = [
   },
 ];
 
+// Each cover is a screenshot of the live app, framed in glass over two paint strokes.
 export const projects = [
   {
-    title: "Personal Portfolio Website",
+    title: "OfficeLog",
+    tag: "Company system",
     description:
-      "A responsive React portfolio presenting my background, skills, projects and contact links in one focused place — the site you're on right now.",
-    tech: ["React", "Tailwind CSS", "Vite"],
-    cover: "browser",
+      "A daily attendance log for a company's workers. Staff clock in by scanning a QR code on the entrance TV and confirming with Face ID; the day's status works itself out.",
+    features: [
+      "Rotating QR code + Face ID (passkey) check-in from the worker's own phone",
+      "Automatic on-time, late, left-early and absent status, with a manager → MD approval flow for reasons",
+      "Records are never edited — corrections are added, and every action lands in an activity log",
+    ],
+    tech: ["Python", "FastAPI", "PostgreSQL", "React", "TypeScript", "WebAuthn"],
+    cover: {
+      image: "/projects/officelog.jpg",
+      url: "officelog-production.up.railway.app",
+      tint: "#F4DCCB",
+      strokes: ["url(#g-orange)", "url(#g-teal)"],
+      dots: "#D6336C",
+    },
     links: [
-      { label: "View code", href: profile.github },
-      { label: "Live site", href: "#top" },
+      { label: "Live site", href: "https://officelog-production.up.railway.app/" },
+      { label: "View code", href: "https://github.com/ceetek1/officelog" },
     ],
   },
   {
-    title: "JavaScript Learning Projects",
+    title: "BundoPay",
+    tag: "PayPal Hackathon",
     description:
-      "Small browser-based projects and exercises for practising core JavaScript, DOM interactions and UI behaviour.",
-    tech: ["JavaScript", "HTML", "CSS"],
-    cover: "script",
-    links: [{ label: "View on GitHub", href: profile.github }],
+      "Helps PayPal sellers look after their money. Gemini drafts, code decides, the owner approves — and it all runs on the PayPal sandbox, so no real money moves.",
+    features: [
+      "Bundo, an AI assistant, drafts dispute replies; small ones are refunded automatically",
+      "Jars set money aside for tax, disputes and ads, checked against limits the seller chooses",
+      "A tamper-evident, signed record of every action",
+    ],
+    tech: ["Next.js", "FastAPI", "Supabase", "PayPal APIs", "Gemini"],
+    cover: {
+      image: "/projects/bundopay.jpg",
+      url: "bundo-pay.vercel.app",
+      tint: "#DDE2F5",
+      strokes: ["url(#g-blue)", "#F7B32B"],
+      dots: "#E8501A",
+    },
+    links: [
+      { label: "Live site", href: "https://bundo-pay.vercel.app/" },
+      { label: "View code", href: "https://github.com/KYNETIC3/bundoPay" },
+    ],
   },
   {
-    title: "University Coursework",
+    title: "Tasktion",
+    tag: "Planner app",
     description:
-      "Programming assignments, documentation and collaborative software engineering work from Pan-Atlantic University.",
-    tech: ["Software Engineering", "GitHub", "Documentation"],
-    cover: "papers",
-    links: [{ label: "View on GitHub", href: profile.github }],
+      "A private task app for a group of friends: hand each other tasks, see who's doing what, and get a reminder before anything is due.",
+    features: [
+      "Invite-only friends group with Google or email sign-in",
+      "An email reminder about 24 hours before each deadline",
+      "Installs to the iPhone home screen, with a morning plan and evening review by email",
+    ],
+    tech: ["FastAPI", "PostgreSQL", "Supabase", "React", "TypeScript"],
+    cover: {
+      image: "/projects/tasktion.jpg",
+      url: "tasktion-production.up.railway.app",
+      tint: "#D5ECE9",
+      strokes: ["url(#g-gold)", "#0F6E78"],
+      dots: "#2D4BB0",
+    },
+    links: [
+      { label: "Live site", href: "https://tasktion-production.up.railway.app/" },
+      { label: "View code", href: "https://github.com/ceetek1/Tasktion_App" },
+    ],
   },
 ];
 
@@ -90,7 +133,7 @@ export const tourStops = {
   hero: { step: 0, line: "Hey — I'm Bob. Come along, I'll show you around.", next: "#about", nextLabel: "Start the tour" },
   about: { step: 1, line: "This is the human behind the paint. Charles studies Software Engineering at Pan-Atlantic University.", next: "#skills", nextLabel: "Next stop: his toolbox" },
   skills: { step: 2, line: "His brushes. Python, JavaScript and React do most of the painting around here.", next: "#projects", nextLabel: "Next stop: the work" },
-  projects: { step: 3, line: "The good stuff! Hover a card — I left a little wet paint on each one.", next: "#education", nextLabel: "Next stop: school" },
+  projects: { step: 3, line: "The good stuff — a hackathon build, a system a real company runs on, and a planner. All live, go poke them!", next: "#education", nextLabel: "Next stop: school" },
   education: { step: 4, line: "Where the foundations get poured, one assignment at a time.", next: "#contact", nextLabel: "Last stop" },
   contact: { step: 5, line: "End of the tour! If something caught your eye, Charles would love to hear from you.", next: "#top", nextLabel: "Back to the start" },
 };
