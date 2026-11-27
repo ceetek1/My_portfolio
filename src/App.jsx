@@ -329,73 +329,23 @@ function Skills() {
 }
 
 /* ---------- Projects ---------- */
-function ProjectCover({ type }) {
-  if (type === "browser") {
-    return (
-      <div className="project-cover" style={{ background: "#F4DCCB" }}>
-        <div className="art">
-          <svg viewBox="0 0 600 420" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-            <Stroke d="M-40,300 C120,160 300,120 640,140" color="url(#g-orange)" width="150" />
-            <Stroke d="M-20,420 C180,360 380,400 640,330" color="url(#g-teal)" width="70" />
-            <circle cx="520" cy="70" r="18" fill="#D6336C" /><circle cx="560" cy="100" r="7" fill="#D6336C" />
-          </svg>
-          <div className="glass" style={{ position: "absolute", left: "16%", top: "16%", width: "68%", height: "66%", borderRadius: 20, overflow: "hidden", display: "flex", flexDirection: "column" }}>
-            <div style={{ display: "flex", gap: 7, padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.6)" }}>
-              {["#E8501A", "#F7B32B", "#2BB3B1"].map((c) => <span key={c} style={{ width: 11, height: 11, borderRadius: "50%", background: c }} />)}
-            </div>
-            <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 18, padding: "18px 22px" }}>
-              <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 10 }}>
-                <span style={{ height: 14, width: "80%", borderRadius: 8, background: "rgba(22,21,19,.82)" }} />
-                <span style={{ height: 14, width: "56%", borderRadius: 8, background: "rgba(22,21,19,.82)" }} />
-                <span style={{ height: 8, width: "70%", borderRadius: 8, background: "rgba(22,21,19,.25)", marginTop: 6 }} />
-                <span style={{ height: 8, width: "60%", borderRadius: 8, background: "rgba(22,21,19,.25)" }} />
-              </div>
-              <svg viewBox="0 0 40 40" width="64" height="64" aria-hidden="true">
-                <path d="M20,3 C30,3 37,10 37,20 C37,30 30,37 20,37 C10,37 3,30 3,20 C3,10 10,3 20,3 Z" fill="url(#g-orange)" filter="url(#paint-soft)" />
-                <circle cx="16" cy="19" r="2.4" fill="#161513" /><circle cx="24" cy="19" r="2.4" fill="#161513" />
-              </svg>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  if (type === "script") {
-    return (
-      <div className="project-cover" style={{ background: "#D5ECE9" }}>
-        <div className="art">
-          <svg viewBox="0 0 600 420" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-            <path d="M300,60 C420,60 500,140 500,220 C500,320 400,380 300,370 C190,360 110,300 110,210 C110,120 190,60 300,60 Z" fill="url(#g-gold)" filter="url(#paint)" />
-            <Stroke d="M-30,120 C100,80 180,140 300,100" color="#0F6E78" width="40" />
-            <Stroke d="M330,400 C430,360 520,390 640,340" color="#D6336C" width="30" />
-            <circle cx="80" cy="330" r="16" fill="#2D4BB0" /><circle cx="120" cy="360" r="6" fill="#2D4BB0" /><circle cx="540" cy="80" r="10" fill="#0F6E78" />
-          </svg>
-          <span className="display" aria-hidden="true" style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "clamp(120px, 14vw, 200px)", fontWeight: 800, letterSpacing: "-0.06em", color: "#0B4F57", lineHeight: 1 }}>{"{ }"}</span>
-          <span className="glass mono" style={{ position: "absolute", right: 22, bottom: 22, padding: "8px 14px", borderRadius: 999, fontSize: 12, color: "#161513" }}>script.js</span>
-        </div>
-      </div>
-    );
-  }
-  const paper = { position: "absolute", left: "50%", top: "50%", width: "46%", aspectRatio: "3 / 4", borderRadius: 12, background: "#FBFAF7", boxShadow: "0 18px 40px -14px rgba(22,21,19,.35)" };
-  const line = (width, extra) => ({ height: 6, width, borderRadius: 6, background: "rgba(22,21,19,.18)", ...extra });
+// A screenshot of the live app in a glass browser window, laid over two paint strokes.
+function ProjectCover({ cover, title }) {
+  const [first, second] = cover.strokes;
   return (
-    <div className="project-cover" style={{ background: "#DDE2F5" }}>
+    <div className="project-cover" style={{ background: cover.tint }}>
       <div className="art">
         <svg viewBox="0 0 600 420" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-          <Stroke d="M-40,160 C120,100 260,200 640,90" color="url(#g-blue)" width="130" />
-          <Stroke d="M-20,380 C160,330 340,390 640,320" color="#F7B32B" width="44" />
-          <circle cx="500" cy="330" r="14" fill="#E8501A" />
+          <Stroke d="M-40,300 C120,160 300,120 640,140" color={first} width="150" />
+          <Stroke d="M-20,420 C180,360 380,400 640,330" color={second} width="70" />
+          <circle cx="520" cy="70" r="18" fill={cover.dots} /><circle cx="560" cy="100" r="7" fill={cover.dots} />
         </svg>
-        <div style={{ ...paper, transform: "translate(-62%, -50%) rotate(-9deg)" }} />
-        <div style={{ ...paper, transform: "translate(-40%, -50%) rotate(5deg)" }} />
-        <div style={{ ...paper, background: "#FFFFFF", boxShadow: "0 22px 50px -14px rgba(22,21,19,.4)", transform: "translate(-50%, -50%) rotate(-1.5deg)", boxSizing: "border-box", padding: "9% 10%", display: "flex", flexDirection: "column", gap: 9 }}>
-          <span className="mono" style={{ fontSize: 10, color: "#2D4BB0" }}>Assignment 04</span>
-          <span style={{ height: 10, width: "85%", borderRadius: 6, background: "#161513" }} />
-          <span style={line("100%", { marginTop: 6 })} />
-          <span style={line("92%")} />
-          <span style={line("96%")} />
-          <span style={line("60%")} />
-          <span style={{ height: 34, width: "100%", borderRadius: 8, background: "#2D4BB0", opacity: 0.85, marginTop: 8 }} />
+        <div className="glass shot-frame">
+          <div className="shot-bar">
+            {["#E8501A", "#F7B32B", "#2BB3B1"].map((c) => <span key={c} className="shot-dot" style={{ background: c }} />)}
+            <span className="shot-url">{cover.url}</span>
+          </div>
+          <img className="shot" src={cover.image} alt={`${title} sign-in screen`} loading="lazy" decoding="async" />
         </div>
       </div>
     </div>
@@ -413,19 +363,26 @@ function Projects() {
         <div className="project-list">
           {projects.map((project, i) => (
             <article className={`project glass lift reveal${i % 2 ? " flip" : ""}`} key={project.title}>
-              <ProjectCover type={project.cover} />
+              <ProjectCover cover={project.cover} title={project.title} />
               <div className="project-body">
-                <span className="num" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+                <div className="project-head">
+                  <span className="num" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="mono project-tag">{project.tag}</span>
+                </div>
                 <h3 className="display">{project.title}</h3>
                 <p>{project.description}</p>
+                <ul className="project-features">
+                  {project.features.map((f) => <li key={f}>{f}</li>)}
+                </ul>
                 <div className="chips">
                   {project.tech.map((t) => <span className="chip" key={t}>{t}</span>)}
                 </div>
                 <div className="project-links">
                   {project.links.map((link) => (
-                    <a key={link.label} href={link.href} className="text-link">
+                    <a key={link.label} href={link.href} className="text-link" target="_blank" rel="noopener noreferrer">
                       {link.label}
                       <ArrowUpRight size={16} aria-hidden="true" />
+                      <span className="sr-only"> (opens in a new tab)</span>
                     </a>
                   ))}
                 </div>
